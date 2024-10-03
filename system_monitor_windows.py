@@ -6,7 +6,7 @@ import requests
 import time
 
 # PushPlus Token
-PUSHPLUS_TOKEN = "0155cda448fe4f78894d81553df7704e"
+PUSHPLUS_TOKEN = "你的token"
 
 # 推送消息函数
 def pushplus_message(title, content):
