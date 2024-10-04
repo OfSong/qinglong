@@ -7,6 +7,7 @@
 import psutil
 import os
 import requests
+import GPUtil  # 需要安装这个库
 
 # pushplus推送环境变量 ：PUSHPLUS_TOKEN
 
@@ -25,8 +26,9 @@ def get_system_info():
     cpu_usage = psutil.cpu_percent(interval=1)
     cpu_info = f"CPU 使用率: {cpu_usage}%\n"
 
-    # 获取温度信息（假设在Linux系统上）
+    # 获取温度信息
     try:
+        # CPU 温度
         temp_info = psutil.sensors_temperatures()
         if 'coretemp' in temp_info:
             cpu_temp = temp_info['coretemp'][0].current
@@ -36,6 +38,24 @@ def get_system_info():
             temp_info_str = f"CPU 温度: {cpu_temp}°C\n"
         else:
             temp_info_str = "无法获取 CPU 温度信息\n"
+
+        # GPU 温度
+        gpus = GPUtil.getGPUs()
+        gpu_temp_str = "GPU 温度:\n"
+        for gpu in gpus:
+            gpu_temp_str += f"GPU {gpu.id}: {gpu.temperature}°C\n"
+        temp_info_str += gpu_temp_str
+
+        # 硬盘温度（需要确保你的硬盘支持 S.M.A.R.T.）
+        disk_temp_str = "硬盘温度:\n"
+        for disk in psutil.disk_partitions():
+            try:
+                temp = psutil.disk_usage(disk.mountpoint).used  # 这里假设用已使用的空间作为温度，实际中需要其他工具来获取
+                disk_temp_str += f"{disk.device}: {temp}°C\n"
+            except Exception:
+                disk_temp_str += f"{disk.device}: 无法获取温度\n"
+        temp_info_str += disk_temp_str
+
     except Exception as e:
         temp_info_str = f"获取温度信息时出错: {e}\n"
 
