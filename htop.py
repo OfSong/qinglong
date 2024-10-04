@@ -25,7 +25,21 @@ def get_system_info():
     cpu_usage = psutil.cpu_percent(interval=1)
     cpu_info = f"CPU 使用率: {cpu_usage}%\n"
 
-    return memory_info + disk_info + cpu_info
+    # 获取温度信息（假设在Linux系统上）
+    try:
+        temp_info = psutil.sensors_temperatures()
+        if 'coretemp' in temp_info:
+            cpu_temp = temp_info['coretemp'][0].current
+            temp_info_str = f"CPU 温度: {cpu_temp}°C\n"
+        elif 'thermal_zone' in temp_info:
+            cpu_temp = temp_info['thermal_zone_0'][0].current
+            temp_info_str = f"CPU 温度: {cpu_temp}°C\n"
+        else:
+            temp_info_str = "无法获取 CPU 温度信息\n"
+    except Exception as e:
+        temp_info_str = f"获取温度信息时出错: {e}\n"
+
+    return memory_info + disk_info + cpu_info + temp_info_str
 
 # PushPlus 推送消息
 def send_pushplus_message(token, title, content):
