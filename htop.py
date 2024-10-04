@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -- coding: utf-8 --
 # -------------------------------
-# cron "0 */3 * * *" script-path=xxx.py,tag=匹配cron用
+# cron "0 */1 * * *" script-path=xxx.py,tag=匹配cron用
 # const $ = new Env('监控系统状态')
 
 import psutil
