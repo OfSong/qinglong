@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# !/usr/bin/python3
+# -------------------------------
+# cron "5 8 * * *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('Linux_Do')
+
 import os
 import time
 import logging

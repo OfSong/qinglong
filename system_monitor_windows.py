@@ -1,3 +1,9 @@
+# !/usr/bin/python3
+# -- coding: utf-8 --
+# -------------------------------
+# cron "0 */3 * * *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('windows系统状态监控')
+
 import os
 import psutil
 import platform

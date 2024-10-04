@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # _*_ coding:utf-8 _*_
+# -------------------------------
+# cron "0 0 1 1 *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('通知模块')
+
 import base64
 import hashlib
 import hmac

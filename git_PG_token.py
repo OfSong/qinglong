@@ -1,3 +1,9 @@
+# !/usr/bin/python3
+# -- coding: utf-8 --
+# -------------------------------
+# cron "0 0 1 1 *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('胖乖获取token')
+
 import requests
 
 # 用户输入手机号

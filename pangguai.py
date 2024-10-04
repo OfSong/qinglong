@@ -1,4 +1,10 @@
-"""
+# !/usr/bin/python3
+# -- coding: utf-8 --
+# -------------------------------
+# cron "0 8 * * *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('胖乖生活')
+
+""
  * 胖乖生活
  * 开源，停更
  * 设置变量 PGSH_TOKEN,多号使用&隔开，青龙直接新建变量即可 ，网页获取ck：https://bigostk.github.io/pg/
