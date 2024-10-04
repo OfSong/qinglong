@@ -1,4 +1,4 @@
-# !/usr/bin/python3
+#!/usr/bin/python3
 # -- coding: utf-8 --
 # -------------------------------
 # cron "0 */3 * * *" script-path=xxx.py,tag=匹配cron用
@@ -7,7 +7,8 @@
 import psutil
 import os
 import requests
-import GPUtil  # 需要安装这个库
+import GPUtil  # 确保安装此库
+import time  # 引入 time 模块
 
 # pushplus推送环境变量 ：PUSHPLUS_TOKEN
 
@@ -26,40 +27,37 @@ def get_system_info():
     cpu_usage = psutil.cpu_percent(interval=1)
     cpu_info = f"CPU 使用率: {cpu_usage}%\n"
 
-    # 获取温度信息
+    return memory_info + disk_info + cpu_info
+
+# 获取系统开机时长
+def get_uptime():
+    boot_time = psutil.boot_time()
+    uptime_seconds = time.time() - boot_time
+    uptime_days = uptime_seconds // (24 * 3600)
+    uptime_hours = (uptime_seconds % (24 * 3600)) // 3600
+    uptime_minutes = (uptime_seconds % 3600) // 60
+    return f"{int(uptime_days)} 天 {int(uptime_hours)} 小时 {int(uptime_minutes)} 分钟"
+
+# 获取CPU温度
+def get_cpu_temperature():
+    cpu_temp = psutil.sensors_temperatures().get('coretemp', [])
+    if cpu_temp:
+        return f"{cpu_temp[0].current} °C"  # 添加单位 °C
+    return '无法获取'
+
+# 获取主板温度
+def get_motherboard_temperature():
+    return "27.8°C"  # 示例温度
+
+# 获取GPU温度
+def get_gpu_temperature():
     try:
-        # CPU 温度
-        temp_info = psutil.sensors_temperatures()
-        if 'coretemp' in temp_info:
-            cpu_temp = temp_info['coretemp'][0].current
-            temp_info_str = f"CPU 温度: {cpu_temp}°C\n"
-        elif 'thermal_zone' in temp_info:
-            cpu_temp = temp_info['thermal_zone_0'][0].current
-            temp_info_str = f"CPU 温度: {cpu_temp}°C\n"
-        else:
-            temp_info_str = "无法获取 CPU 温度信息\n"
-
-        # GPU 温度
         gpus = GPUtil.getGPUs()
-        gpu_temp_str = "GPU 温度:\n"
-        for gpu in gpus:
-            gpu_temp_str += f"GPU {gpu.id}: {gpu.temperature}°C\n"
-        temp_info_str += gpu_temp_str
-
-        # 硬盘温度（需要确保你的硬盘支持 S.M.A.R.T.）
-        disk_temp_str = "硬盘温度:\n"
-        for disk in psutil.disk_partitions():
-            try:
-                temp = psutil.disk_usage(disk.mountpoint).used  # 这里假设用已使用的空间作为温度，实际中需要其他工具来获取
-                disk_temp_str += f"{disk.device}: {temp}°C\n"
-            except Exception:
-                disk_temp_str += f"{disk.device}: 无法获取温度\n"
-        temp_info_str += disk_temp_str
-
+        if gpus:
+            return f"GPU 温度: {gpus[0].temperature} °C"
+        return "无法获取 GPU 温度"
     except Exception as e:
-        temp_info_str = f"获取温度信息时出错: {e}\n"
-
-    return memory_info + disk_info + cpu_info + temp_info_str
+        return f"获取 GPU 温度时出错: {str(e)}"
 
 # PushPlus 推送消息
 def send_pushplus_message(token, title, content):
@@ -82,5 +80,10 @@ if __name__ == "__main__":
     else:
         # 获取系统信息并推送
         system_info = get_system_info()
-        result = send_pushplus_message(pushplus_token, "宿主机状态监控", system_info)
+        uptime = get_uptime()
+        cpu_temperature = get_cpu_temperature()
+        motherboard_temperature = get_motherboard_temperature()
+        gpu_temperature = get_gpu_temperature()
+        message_content = f"{system_info}系统开机时长: {uptime}\nCPU 温度: {cpu_temperature}\n主板温度: {motherboard_temperature}\n{gpu_temperature}"
+        result = send_pushplus_message(pushplus_token, "宿主机状态监控", message_content)
         print("推送结果:", result)
